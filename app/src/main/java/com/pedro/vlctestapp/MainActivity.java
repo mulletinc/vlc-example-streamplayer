@@ -1,64 +1,35 @@
 package com.pedro.vlctestapp;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.view.SurfaceView;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
 
-import com.pedro.vlc.VlcListener;
-import com.pedro.vlc.VlcVideoLibrary;
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-import java.util.Arrays;
-
-/**
- * Created by pedro on 25/06/17.
- */
-public class MainActivity extends AppCompatActivity implements VlcListener, View.OnClickListener {
-
-    private VlcVideoLibrary vlcVideoLibrary;
-    private Button bStartStop;
-    private EditText etEndpoint;
-
-    private String[] options = new String[]{":fullscreen"};
+    public static final int REQUEST_CODE_FULL_SCREEN_ACTIVITY = 101;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
-        SurfaceView surfaceView = findViewById(R.id.surfaceView);
-        bStartStop = findViewById(R.id.b_start_stop);
+        Button bStartStop = findViewById(R.id.b_start_stop);
         bStartStop.setOnClickListener(this);
-        etEndpoint = findViewById(R.id.et_endpoint);
-        etEndpoint.setText("rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov");
-        vlcVideoLibrary = new VlcVideoLibrary(this, this, surfaceView);
-        vlcVideoLibrary.setOptions(Arrays.asList(options));
     }
 
     @Override
-    public void onComplete() {
-        Toast.makeText(this, "Playing", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onError() {
-        Toast.makeText(this, "Error, make sure your endpoint is correct", Toast.LENGTH_SHORT).show();
-        vlcVideoLibrary.stop();
-        bStartStop.setText(getString(R.string.start_player));
-    }
-
-    @Override
-    public void onClick(View view) {
-        if (!vlcVideoLibrary.isPlaying()) {
-            vlcVideoLibrary.play(etEndpoint.getText().toString());
-            bStartStop.setText(getString(R.string.stop_player));
-        } else {
-            vlcVideoLibrary.stop();
-            bStartStop.setText(getString(R.string.start_player));
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.b_start_stop:
+                startFullScreenActivity();
+                break;
         }
+    }
+
+    private void startFullScreenActivity() {
+        startActivityForResult(FullScreenActivity.createIntent(this,
+                "rtsp://admin:@192.168.1.142"),
+                REQUEST_CODE_FULL_SCREEN_ACTIVITY);
     }
 }
